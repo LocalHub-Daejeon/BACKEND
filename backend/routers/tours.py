@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 
-from schemas.tour import TourDetail, TourListResponse
+from schemas.tour import TourDetail, TourListItem, TourListResponse
 from services import tour_service
 
 router = APIRouter(prefix="/tours", tags=["tours"])
@@ -17,6 +17,16 @@ def list_tours(
         keyword=keyword, content_type_id=content_type_id, page=page, size=size
     )
     return TourListResponse(items=items, page=page, size=size, total=total)
+
+
+@router.get("/map", response_model=list[TourListItem])
+def list_tours_for_map(
+    keyword: str | None = Query(default=None),
+    content_type_id: int | None = Query(default=None),
+):
+    return tour_service.list_tours_for_map(
+        keyword=keyword, content_type_id=content_type_id
+    )
 
 
 @router.get("/{content_id}", response_model=TourDetail)

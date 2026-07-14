@@ -66,6 +66,28 @@ def search_tours(
     return tours[start:end], total
 
 
+def list_tours_for_map(
+    keyword: str | None = None,
+    content_type_id: int | None = None,
+) -> list[dict]:
+    tours = _load_tours()
+
+    if content_type_id is not None:
+        type_id_str = str(content_type_id)
+        tours = [t for t in tours if t.get("contenttypeid") == type_id_str]
+
+    if keyword:
+        keyword_lower = keyword.lower()
+        tours = [
+            t
+            for t in tours
+            if keyword_lower in t.get("title", "").lower()
+            or keyword_lower in t.get("addr1", "").lower()
+        ]
+
+    return tours
+
+
 def get_tour_by_id(content_id: str) -> dict | None:
     tours = _load_tours()
     for tour in tours:
