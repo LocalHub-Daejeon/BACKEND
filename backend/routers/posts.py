@@ -5,13 +5,13 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models.post import Post
 from schemas.post import (
+    PostCategory,
     PostCreate,
     PostDelete,
     PostListResponse,
     PostResponse,
     PostUpdate,
 )
-from services.security import hash_password, verify_password
 
 router = APIRouter(prefix="/posts", tags=["posts"])
 
@@ -19,11 +19,14 @@ router = APIRouter(prefix="/posts", tags=["posts"])
 @router.get("", response_model=PostListResponse)
 def list_posts(
     keyword: str | None = Query(default=None),
+    category: PostCategory | None = Query(default=None),
     page: int = Query(default=1, ge=1),
     size: int = Query(default=10, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
     query = db.query(Post)
+    if category:
+        query = query.filter(Post.category == category)
     if keyword:
         like = f"%{keyword}%"
         query = query.filter(or_(Post.title.like(like), Post.content.like(like)))
@@ -53,9 +56,10 @@ def get_post(post_id: int, db: Session = Depends(get_db)):
 @router.post("", response_model=PostResponse, status_code=201)
 def create_post(payload: PostCreate, db: Session = Depends(get_db)):
     post = Post(
+        category=payload.category,
         title=payload.title,
         content=payload.content,
-        password_hash=hash_password(payload.password),
+        password=payload.password,
     )
     db.add(post)
     db.commit()
@@ -68,9 +72,10 @@ def update_post(post_id: int, payload: PostUpdate, db: Session = Depends(get_db)
     post = db.query(Post).filter(Post.id == post_id).first()
     if post is None:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
-    if not verify_password(payload.password, post.password_hash):
+    if payload.password != post.password:
         raise HTTPException(status_code=403, detail="비밀번호가 일치하지 않습니다.")
 
+    post.category = payload.category
     post.title = payload.title
     post.content = payload.content
     db.commit()
@@ -83,7 +88,7 @@ def delete_post(post_id: int, payload: PostDelete, db: Session = Depends(get_db)
     post = db.query(Post).filter(Post.id == post_id).first()
     if post is None:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
-    if not verify_password(payload.password, post.password_hash):
+    if payload.password != post.password:
         raise HTTPException(status_code=403, detail="비밀번호가 일치하지 않습니다.")
 
     db.delete(post)
