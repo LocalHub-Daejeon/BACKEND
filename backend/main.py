@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 load_dotenv()
 
 from database import Base, engine
-from routers import chat, health, posts, tours
+from routers import chat, health, posts, tours, weather
 
 Base.metadata.create_all(bind=engine)
 
@@ -27,3 +27,4 @@ app.include_router(health.router, prefix="/api")
 app.include_router(tours.router, prefix="/api")
 app.include_router(posts.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
+app.include_router(weather.router, prefix="/api")
