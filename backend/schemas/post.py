@@ -4,17 +4,18 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 PostCategory = Literal["자유", "맛집", "여행팁", "후기"]
+DEFAULT_CATEGORY: PostCategory = "자유"
 
 
 class PostCreate(BaseModel):
-    category: PostCategory
+    category: PostCategory = DEFAULT_CATEGORY
     title: str = Field(..., min_length=1, max_length=200)
     content: str = Field(..., min_length=1)
     password: str = Field(..., min_length=1, max_length=100)
 
 
 class PostUpdate(BaseModel):
-    category: PostCategory
+    category: PostCategory = DEFAULT_CATEGORY
     title: str = Field(..., min_length=1, max_length=200)
     content: str = Field(..., min_length=1)
     password: str = Field(..., min_length=1, max_length=100)
