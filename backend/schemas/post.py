@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-PostCategory = Literal["자유", "맛집", "여행팁", "후기"]
+PostCategory = Literal["자유", "맛집 추천", "여행팁", "기타 후기"]
 DEFAULT_CATEGORY: PostCategory = "자유"
 
 
