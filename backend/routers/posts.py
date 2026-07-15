@@ -12,6 +12,7 @@ from schemas.post import (
     PostResponse,
     PostUpdate,
 )
+from services.connection_manager import manager
 
 router = APIRouter(prefix="/posts", tags=["posts"])
 
@@ -64,6 +65,7 @@ def create_post(payload: PostCreate, db: Session = Depends(get_db)):
     db.add(post)
     db.commit()
     db.refresh(post)
+    manager.broadcast_from_sync({"type": "new_post", "id": post.id, "title": post.title})
     return post
 
 

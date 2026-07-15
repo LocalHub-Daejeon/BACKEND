@@ -39,21 +39,24 @@ def _fetch_ultra_srt_ncst() -> dict:
     )
     base_date, base_time = _latest_base_datetime(datetime.now())
 
-    response = requests.get(
-        f"{endpoint}/getUltraSrtNcst",
-        params={
-            "serviceKey": service_key,
-            "dataType": "JSON",
-            "base_date": base_date,
-            "base_time": base_time,
-            "nx": DAEJEON_NX,
-            "ny": DAEJEON_NY,
-            "numOfRows": 10,
-            "pageNo": 1,
-        },
-        timeout=5,
-    )
-    response.raise_for_status()
+    try:
+        response = requests.get(
+            f"{endpoint}/getUltraSrtNcst",
+            params={
+                "serviceKey": service_key,
+                "dataType": "JSON",
+                "base_date": base_date,
+                "base_time": base_time,
+                "nx": DAEJEON_NX,
+                "ny": DAEJEON_NY,
+                "numOfRows": 10,
+                "pageNo": 1,
+            },
+            timeout=5,
+        )
+        response.raise_for_status()
+    except requests.exceptions.RequestException as exc:
+        raise RuntimeError(f"기상청 API 호출 실패: {exc}") from exc
     body = response.json()["response"]
 
     result_code = body["header"]["resultCode"]
