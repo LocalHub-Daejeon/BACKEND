@@ -11,6 +11,8 @@ class TourListItem(BaseModel):
     firstimage: str
     mapx: str
     mapy: str
+    eventstartdate: str = ""
+    eventenddate: str = ""
 
 
 class TourDetail(BaseModel):
@@ -28,6 +30,8 @@ class TourDetail(BaseModel):
     firstimage2: str
     createdtime: str
     modifiedtime: str
+    eventstartdate: str = ""
+    eventenddate: str = ""
 
 
 class TourListResponse(BaseModel):
